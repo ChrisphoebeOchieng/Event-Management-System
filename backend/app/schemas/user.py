@@ -1,7 +1,6 @@
-from app import ma
-from marshmallow import fields, validate
+from marshmallow import Schema, fields, validate
 
-class UserRegistrationSchema(ma.Schema):
+class UserRegistrationSchema(Schema):
     username = fields.Str(required=True, validate=validate.Length(min=3, max=80))
     email = fields.Email(required=True)
     password = fields.Str(required=True, validate=validate.Length(min=6))
@@ -9,11 +8,11 @@ class UserRegistrationSchema(ma.Schema):
     last_name = fields.Str(required=True, validate=validate.Length(min=1, max=50))
     phone_number = fields.Str(validate=validate.Length(max=20))
 
-class UserLoginSchema(ma.Schema):
+class UserLoginSchema(Schema):
     email = fields.Email(required=True)
     password = fields.Str(required=True)
 
-class UserResponseSchema(ma.Schema):
+class UserResponseSchema(Schema):
     id = fields.Int()
     username = fields.Str()
     email = fields.Email()
