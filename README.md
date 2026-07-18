@@ -1,3 +1,3 @@
 # Event Management System
 
-Final Year Project - Event Management System
+ Event Management System
