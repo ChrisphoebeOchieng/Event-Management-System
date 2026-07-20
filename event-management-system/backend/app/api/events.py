@@ -12,18 +12,21 @@ events_bp = Blueprint('events', __name__)
 @events_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_event():
-    user_id = get_jwt_identity()
-    user = User.query.get(int(user_id))
-    
-    if not user or user.role.value not in ['organizer', 'admin']:
-        return jsonify({'error': 'Only organizers and admins can create events'}), 403
-
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(int(user_id))
+        
+        if not user or user.role.value not in ['organizer', 'admin']:
+            return jsonify({'error': 'Only organizers and admins can create events'}), 403
+
         schema = EventCreateSchema()
         data = schema.load(request.json)
     except ValidationError as err:
         print("Validation error:", err.messages)
         return jsonify({'errors': err.messages}), 400
+    except Exception as e:
+        print("Error:", str(e))
+        return jsonify({'error': str(e)}), 400
 
     # Check dates
     start_date = data['start_date']
@@ -59,8 +62,13 @@ def create_event():
         created_by=int(user_id)
     )
 
-    db.session.add(event)
-    db.session.commit()
+    try:
+        db.session.add(event)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print("Database error:", str(e))
+        return jsonify({'error': 'Database error: ' + str(e)}), 500
 
     response_schema = EventResponseSchema()
     return jsonify({
@@ -117,17 +125,17 @@ def get_event(event_id):
 @events_bp.route('/<int:event_id>', methods=['PUT'])
 @jwt_required()
 def update_event(event_id):
-    user_id = get_jwt_identity()
-    user = User.query.get(int(user_id))
-    event = Event.query.get(event_id)
-
-    if not event:
-        return jsonify({'error': 'Event not found'}), 404
-
-    if user.role.value != 'admin' and int(user_id) != event.created_by:
-        return jsonify({'error': 'You are not authorized to update this event'}), 403
-
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(int(user_id))
+        event = Event.query.get(event_id)
+
+        if not event:
+            return jsonify({'error': 'Event not found'}), 404
+
+        if user.role.value != 'admin' and int(user_id) != event.created_by:
+            return jsonify({'error': 'You are not authorized to update this event'}), 403
+
         schema = EventUpdateSchema()
         data = schema.load(request.json)
     except ValidationError as err:
@@ -166,18 +174,6 @@ def delete_event(event_id):
     db.session.commit()
 
     return jsonify({'message': 'Event deleted successfully'}), 200
-
-@events_bp.route('/organizer/<int:organizer_id>', methods=['GET'])
-def get_organizer_events(organizer_id):
-    user = User.query.get(organizer_id)
-    
-    if not user:
-        return jsonify({'error': 'Organizer not found'}), 404
-
-    events = Event.query.filter_by(created_by=organizer_id, status='published').order_by(Event.start_date).all()
-
-    response_schema = EventResponseSchema(many=True)
-    return jsonify(response_schema.dump(events)), 200
 
 @events_bp.route('/my-events', methods=['GET'])
 @jwt_required()
