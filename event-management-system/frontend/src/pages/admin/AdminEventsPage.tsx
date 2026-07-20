@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AdminLayout from '../../components/admin/AdminLayout';
+import BackButton from '../../components/admin/BackButton';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
 import { 
@@ -7,9 +9,7 @@ import {
   PlusCircleIcon,
   PencilIcon,
   TrashIcon,
-  EyeIcon,
-  CheckBadgeIcon,
-  XMarkIcon
+  EyeIcon
 } from '@heroicons/react/24/outline';
 
 interface Event {
@@ -99,18 +99,20 @@ const AdminEventsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <AdminLayout>
         <div className="animate-pulse space-y-4">
           <div className="h-10 bg-gray-200 rounded w-1/4"></div>
           <div className="h-12 bg-gray-200 rounded"></div>
           <div className="h-64 bg-gray-200 rounded-xl"></div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <AdminLayout>
+      <BackButton />
+      
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Manage Events</h1>
@@ -125,7 +127,6 @@ const AdminEventsPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-xl shadow-soft p-4 mb-6">
         <div className="flex flex-wrap gap-2">
           <button
@@ -171,7 +172,6 @@ const AdminEventsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Events Table */}
       <div className="bg-white rounded-xl shadow-soft overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -253,7 +253,7 @@ const AdminEventsPage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

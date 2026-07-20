@@ -8,16 +8,13 @@ import {
   UserCircleIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  UserGroupIcon,
-  CurrencyDollarIcon
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from '../common/LanguageSwitcher';
-import { useTranslation } from 'react-i18next';
 
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const handleLogout = () => {
@@ -26,7 +23,8 @@ const Navbar: React.FC = () => {
   };
 
   const navigation = [
-    { name: t('common.events'), href: '/events' },
+    { name: 'Home', href: '/' },
+    { name: 'Events', href: '/events' },
   ];
 
   const getProfilePictureUrl = (): string | undefined => {
@@ -49,15 +47,9 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
-            >
-              {t('common.home')}
-            </Link>
             {navigation.map((item) => (
               <Link
-                key={item.href}
+                key={item.name}
                 to={item.href}
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
               >
@@ -67,20 +59,13 @@ const Navbar: React.FC = () => {
             
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <Link
-                  to="/dashboard"
-                  className="text-gray-700 hover:text-primary-600 text-sm font-medium transition-colors"
-                >
-                  {t('common.dashboard')}
-                </Link>
-                
                 {isAdmin && (
                   <Link
                     to="/admin"
                     className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium flex items-center gap-1"
                   >
                     <UserGroupIcon className="h-4 w-4" />
-                    {t('admin.dashboard')}
+                    Admin Panel
                   </Link>
                 )}
                 
@@ -115,7 +100,7 @@ const Navbar: React.FC = () => {
                             className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
                           >
                             <Cog6ToothIcon className="h-5 w-5 mr-2" />
-                            {t('common.profile')}
+                            Profile
                           </Link>
                         )}
                       </Menu.Item>
@@ -123,11 +108,11 @@ const Navbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }: { active: boolean }) => (
                             <Link
-                              to="/admin/refunds"
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-red-600`}
+                              to="/admin"
+                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-purple-700`}
                             >
-                              <CurrencyDollarIcon className="h-5 w-5 mr-2" />
-                              {t('admin.refunds')}
+                              <UserGroupIcon className="h-5 w-5 mr-2" />
+                              Admin Panel
                             </Link>
                           )}
                         </Menu.Item>
@@ -139,7 +124,7 @@ const Navbar: React.FC = () => {
                             className={`${active ? 'bg-gray-50' : ''} flex items-center w-full px-4 py-2 text-sm text-red-600`}
                           >
                             <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
-                            {t('common.logout')}
+                            Logout
                           </button>
                         )}
                       </Menu.Item>
@@ -155,13 +140,13 @@ const Navbar: React.FC = () => {
                   to="/login"
                   className="text-gray-700 hover:text-primary-600 text-sm font-medium transition-colors"
                 >
-                  {t('common.login')}
+                  Login
                 </Link>
                 <Link
                   to="/register"
                   className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
                 >
-                  {t('common.register')}
+                  Register
                 </Link>
                 <LanguageSwitcher />
               </div>
@@ -188,7 +173,7 @@ const Navbar: React.FC = () => {
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navigation.map((item) => (
               <Link
-                key={item.href}
+                key={item.name}
                 to={item.href}
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
@@ -198,20 +183,13 @@ const Navbar: React.FC = () => {
             ))}
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/dashboard"
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('common.dashboard')}
-                </Link>
                 {isAdmin && (
                   <Link
                     to="/admin"
                     className="block px-3 py-2 text-base font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {t('admin.dashboard')}
+                    👑 Admin Panel
                   </Link>
                 )}
                 <Link
@@ -219,7 +197,7 @@ const Navbar: React.FC = () => {
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {t('common.profile')}
+                  Profile
                 </Link>
                 <button
                   onClick={() => {
@@ -228,7 +206,7 @@ const Navbar: React.FC = () => {
                   }}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-gray-50 rounded-lg"
                 >
-                  {t('common.logout')}
+                  Logout
                 </button>
                 <div className="pt-2 border-t border-gray-200">
                   <LanguageSwitcher />
@@ -241,14 +219,14 @@ const Navbar: React.FC = () => {
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {t('common.login')}
+                  Login
                 </Link>
                 <Link
                   to="/register"
                   className="block px-3 py-2 text-base font-medium text-primary-600 hover:bg-gray-50 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {t('common.register')}
+                  Register
                 </Link>
                 <div className="pt-2 border-t border-gray-200">
                   <LanguageSwitcher />

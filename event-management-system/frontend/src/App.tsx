@@ -13,20 +13,23 @@ import HomePage from './pages/HomePage';
 import { LoginPage, RegisterPage } from './pages/auth';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
-import DashboardPage from './pages/DashboardPage';
 import BookingsPage from './pages/BookingsPage';
 import BookingDetailPage from './pages/BookingDetailPage';
 import ProfilePage from './pages/ProfilePage';
-import TranslationDemo from './pages/TranslationDemo';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UsersPage from './pages/admin/UsersPage';
+import AddUserPage from './pages/admin/AddUserPage';
 import AdminEventsPage from './pages/admin/AdminEventsPage';
-import AdminEventCreatePage from './pages/admin/AdminEventCreatePage';
+import AddEventPage from './pages/admin/AddEventPage';
 import AdminEventEditPage from './pages/admin/AdminEventEditPage';
 import AdminRefundsPage from './pages/admin/AdminRefundsPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
+import SettingsPage from './pages/admin/SettingsPage';
+import OrganizersPage from './pages/admin/OrganizersPage';
+import AdminBookingsPage from './pages/admin/AdminBookingsPage';
+import AdminVendorsPage from './pages/admin/AdminVendorsPage';
 
 // Protected Route
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -56,7 +59,7 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
   
   if (user?.role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
@@ -73,23 +76,12 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
-        <Route path="/translation-demo" element={<TranslationDemo />} />
         
-        {/* Protected Routes */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          } 
-        />
         <Route 
           path="/bookings" 
           element={
@@ -133,6 +125,14 @@ function AppContent() {
           } 
         />
         <Route 
+          path="/admin/users/add" 
+          element={
+            <AdminRoute>
+              <AddUserPage />
+            </AdminRoute>
+          } 
+        />
+        <Route 
           path="/admin/events" 
           element={
             <AdminRoute>
@@ -144,7 +144,7 @@ function AppContent() {
           path="/admin/events/create" 
           element={
             <AdminRoute>
-              <AdminEventCreatePage />
+              <AddEventPage />
             </AdminRoute>
           } 
         />
@@ -169,6 +169,38 @@ function AppContent() {
           element={
             <AdminRoute>
               <AdminAnalyticsPage />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/settings" 
+          element={
+            <AdminRoute>
+              <SettingsPage />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/organizers" 
+          element={
+            <AdminRoute>
+              <OrganizersPage />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/bookings" 
+          element={
+            <AdminRoute>
+              <AdminBookingsPage />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/vendors" 
+          element={
+            <AdminRoute>
+              <AdminVendorsPage />
             </AdminRoute>
           } 
         />

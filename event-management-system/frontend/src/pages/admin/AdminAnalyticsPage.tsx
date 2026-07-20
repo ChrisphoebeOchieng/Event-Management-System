@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import AdminLayout from '../../components/admin/AdminLayout';
+import BackButton from '../../components/admin/BackButton';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -46,7 +48,7 @@ const AdminAnalyticsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <AdminLayout>
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/4"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -55,7 +57,7 @@ const AdminAnalyticsPage: React.FC = () => {
             ))}
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
@@ -69,7 +71,9 @@ const AdminAnalyticsPage: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <AdminLayout>
+      <BackButton />
+      
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
         <p className="text-gray-500 mt-1">Overview of your platform performance</p>
@@ -124,7 +128,7 @@ const AdminAnalyticsPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

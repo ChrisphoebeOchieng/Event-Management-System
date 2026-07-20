@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import AdminLayout from '../../components/admin/AdminLayout';
+import BackButton from '../../components/admin/BackButton';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
@@ -113,7 +115,7 @@ const AdminRefundsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <AdminLayout>
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/4"></div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -122,12 +124,14 @@ const AdminRefundsPage: React.FC = () => {
             ))}
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <AdminLayout>
+      <BackButton />
+      
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Refund Management</h1>
@@ -216,6 +220,7 @@ const AdminRefundsPage: React.FC = () => {
         )}
       </div>
 
+      {/* Modal */}
       {selectedRefund && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
@@ -250,14 +255,6 @@ const AdminRefundsPage: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-500">Reason</p>
                 <p className="text-gray-700">{selectedRefund.reason}</p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">Status</p>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedRefund.status)}`}>
-                  {getStatusIcon(selectedRefund.status)}
-                  {selectedRefund.status}
-                </span>
               </div>
 
               <div>
@@ -316,7 +313,7 @@ const AdminRefundsPage: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 

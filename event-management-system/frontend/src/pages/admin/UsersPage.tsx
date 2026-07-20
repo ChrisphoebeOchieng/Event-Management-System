@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import AdminLayout from '../../components/admin/AdminLayout';
+import BackButton from '../../components/admin/BackButton';
 import { adminService, User, UserStats } from '../../services/adminService';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { 
   UserCircleIcon, 
   UserGroupIcon,
   CheckBadgeIcon,
   XMarkIcon,
   TrashIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  PlusCircleIcon,
+  EnvelopeIcon,
+  PhoneIcon
 } from '@heroicons/react/24/outline';
 
 const UsersPage: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +63,7 @@ const UsersPage: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: number, userName: string) => {
-    if (!window.confirm(`Are you sure you want to delete user "${userName}"?`)) return;
+    if (!window.confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) return;
     
     try {
       await adminService.deleteUser(userId);
@@ -89,7 +96,7 @@ const UsersPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <AdminLayout>
         <div className="animate-pulse space-y-4">
           <div className="h-10 bg-gray-200 rounded w-1/4"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -99,27 +106,37 @@ const UsersPage: React.FC = () => {
           </div>
           <div className="h-64 bg-gray-200 rounded-xl"></div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <AdminLayout>
+      <BackButton />
+      
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-500 mt-1">Manage all users and their roles</p>
+          <p className="text-gray-500 mt-1">Manage all users on the platform</p>
         </div>
-        <button
-          onClick={fetchData}
-          className="btn-secondary flex items-center gap-2"
-        >
-          <ArrowPathIcon className="h-4 w-4" />
-          Refresh
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={fetchData}
+            className="btn-secondary flex items-center gap-2"
+          >
+            <ArrowPathIcon className="h-4 w-4" />
+            Refresh
+          </button>
+          <button
+            onClick={() => navigate('/admin/users/add')}
+            className="btn-primary flex items-center gap-2"
+          >
+            <PlusCircleIcon className="h-4 w-4" />
+            Add User
+          </button>
+        </div>
       </div>
 
-      {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-soft p-4">
@@ -149,7 +166,6 @@ const UsersPage: React.FC = () => {
         </div>
       )}
 
-      {/* Users Table */}
       <div className="bg-white rounded-xl shadow-soft overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -178,7 +194,16 @@ const UsersPage: React.FC = () => {
                           </span>
                         </div>
                         <div className="text-sm text-gray-500">@{user.username}</div>
-                        <div className="text-xs text-gray-400">{user.email}</div>
+                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                          <EnvelopeIcon className="h-3 w-3" />
+                          <span>{user.email}</span>
+                        </div>
+                        {user.phone_number && (
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <PhoneIcon className="h-3 w-3" />
+                            <span>{user.phone_number}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -191,7 +216,7 @@ const UsersPage: React.FC = () => {
                       <option value="ADMIN">👑 Admin</option>
                       <option value="ORGANIZER">📋 Organizer</option>
                       <option value="ATTENDEE">🎫 Attendee</option>
-                      <option value="VENDOR">🏪 Vendor</option>
+                      <option value="VENDOR">�� Vendor</option>
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -233,7 +258,7 @@ const UsersPage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 
