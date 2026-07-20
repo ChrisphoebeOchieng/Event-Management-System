@@ -46,19 +46,45 @@ const AdminEventCreatePage: React.FC = () => {
     setLoading(true);
 
     try {
+      // Format dates properly
+      const startDate = new Date(formData.start_date);
+      const endDate = new Date(formData.end_date);
+      
       const eventData = {
-        ...formData,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        venue: formData.venue,
+        address: formData.address,
+        city: formData.city,
         capacity: parseInt(formData.capacity),
         ticket_price: parseFloat(formData.ticket_price),
-        start_date: new Date(formData.start_date).toISOString(),
-        end_date: new Date(formData.end_date).toISOString(),
+        status: formData.status || 'draft',
+        is_featured: formData.is_featured || false,
+        image_url: formData.image_url || '',
       };
+
+      console.log('Sending event data:', eventData);
       
-      await api.post('/events/', eventData);
+      const response = await api.post('/events/', eventData);
+      console.log('Response:', response.data);
+      
       toast.success('Event created successfully!');
       navigate('/admin/events');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to create event');
+      console.error('Error creating event:', error);
+      console.error('Error response:', error.response?.data);
+      
+      if (error.response?.data?.errors) {
+        const errors = Object.values(error.response.data.errors).flat();
+        toast.error(errors.join(', '));
+      } else if (error.response?.data?.error) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error('Failed to create event. Please check all fields.');
+      }
     } finally {
       setLoading(false);
     }

@@ -12,7 +12,6 @@ events_bp = Blueprint('events', __name__)
 @events_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_event():
-    """Create a new event (Organizer or Admin only)"""
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
     
@@ -23,13 +22,22 @@ def create_event():
         schema = EventCreateSchema()
         data = schema.load(request.json)
     except ValidationError as err:
+        print("Validation error:", err.messages)
         return jsonify({'errors': err.messages}), 400
 
-    # Validate dates
-    if data['start_date'] >= data['end_date']:
+    # Check dates
+    start_date = data['start_date']
+    end_date = data['end_date']
+    
+    if start_date >= end_date:
         return jsonify({'error': 'End date must be after start date'}), 400
 
-    if data['start_date'] < datetime.utcnow():
+    # Make datetime naive for comparison
+    if start_date.tzinfo is not None:
+        start_date = start_date.replace(tzinfo=None)
+    
+    now = datetime.utcnow()
+    if start_date < now:
         return jsonify({'error': 'Start date cannot be in the past'}), 400
 
     event = Event(
@@ -62,7 +70,6 @@ def create_event():
 
 @events_bp.route('/', methods=['GET'])
 def get_all_events():
-    """Get all events (filter by status, category, city)"""
     status = request.args.get('status')
     category = request.args.get('category')
     city = request.args.get('city')
@@ -73,7 +80,6 @@ def get_all_events():
     if status:
         query = query.filter(Event.status == status)
     else:
-        # Default to only published events for public view
         query = query.filter(Event.status == 'published')
 
     if category:
@@ -92,15 +98,12 @@ def get_all_events():
 
 @events_bp.route('/<int:event_id>', methods=['GET'])
 def get_event(event_id):
-    """Get a single event by ID"""
     event = Event.query.get(event_id)
     
     if not event:
         return jsonify({'error': 'Event not found'}), 404
 
-    # Only show published events to public, but allow owner to see draft
     if event.status != 'published':
-        # Check if user is authenticated and is the owner
         try:
             user_id = get_jwt_identity()
             if int(user_id) != event.created_by:
@@ -114,7 +117,6 @@ def get_event(event_id):
 @events_bp.route('/<int:event_id>', methods=['PUT'])
 @jwt_required()
 def update_event(event_id):
-    """Update an event (Organizer or Admin only)"""
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
     event = Event.query.get(event_id)
@@ -122,7 +124,6 @@ def update_event(event_id):
     if not event:
         return jsonify({'error': 'Event not found'}), 404
 
-    # Check if user is the organizer or admin
     if user.role.value != 'admin' and int(user_id) != event.created_by:
         return jsonify({'error': 'You are not authorized to update this event'}), 403
 
@@ -132,12 +133,10 @@ def update_event(event_id):
     except ValidationError as err:
         return jsonify({'errors': err.messages}), 400
 
-    # Update fields
     for key, value in data.items():
         if value is not None:
             setattr(event, key, value)
 
-    # Validate dates if both are provided
     if data.get('start_date') and data.get('end_date'):
         if data['start_date'] >= data['end_date']:
             return jsonify({'error': 'End date must be after start date'}), 400
@@ -153,7 +152,6 @@ def update_event(event_id):
 @events_bp.route('/<int:event_id>', methods=['DELETE'])
 @jwt_required()
 def delete_event(event_id):
-    """Delete an event (Organizer or Admin only)"""
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
     event = Event.query.get(event_id)
@@ -161,7 +159,6 @@ def delete_event(event_id):
     if not event:
         return jsonify({'error': 'Event not found'}), 404
 
-    # Check if user is the organizer or admin
     if user.role.value != 'admin' and int(user_id) != event.created_by:
         return jsonify({'error': 'You are not authorized to delete this event'}), 403
 
@@ -172,13 +169,11 @@ def delete_event(event_id):
 
 @events_bp.route('/organizer/<int:organizer_id>', methods=['GET'])
 def get_organizer_events(organizer_id):
-    """Get all events by a specific organizer"""
     user = User.query.get(organizer_id)
     
     if not user:
         return jsonify({'error': 'Organizer not found'}), 404
 
-    # For public view, only show published events
     events = Event.query.filter_by(created_by=organizer_id, status='published').order_by(Event.start_date).all()
 
     response_schema = EventResponseSchema(many=True)
@@ -187,7 +182,6 @@ def get_organizer_events(organizer_id):
 @events_bp.route('/my-events', methods=['GET'])
 @jwt_required()
 def get_my_events():
-    """Get all events created by the authenticated user"""
     user_id = get_jwt_identity()
     events = Event.query.filter_by(created_by=int(user_id)).order_by(Event.created_at.desc()).all()
 

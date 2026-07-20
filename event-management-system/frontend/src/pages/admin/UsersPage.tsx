@@ -14,7 +14,6 @@ const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -76,6 +75,16 @@ const UsersPage: React.FC = () => {
       VENDOR: 'bg-orange-100 text-orange-700',
     };
     return colors[role] || 'bg-gray-100 text-gray-700';
+  };
+
+  const getRoleIcon = (role: string) => {
+    const icons: Record<string, string> = {
+      ADMIN: '👑',
+      ORGANIZER: '📋',
+      ATTENDEE: '🎫',
+      VENDOR: '🏪',
+    };
+    return icons[role] || '👤';
   };
 
   if (loading) {
@@ -147,7 +156,6 @@ const UsersPage: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -160,41 +168,45 @@ const UsersPage: React.FC = () => {
                     <div className="flex items-center">
                       <UserCircleIcon className="h-8 w-8 text-gray-400 mr-3" />
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.first_name} {user.last_name}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-900">
+                            {user.first_name} {user.last_name}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${getRoleBadgeColor(user.role)}`}>
+                            <span>{getRoleIcon(user.role)}</span>
+                            <span>{user.role}</span>
+                          </span>
                         </div>
                         <div className="text-sm text-gray-500">@{user.username}</div>
+                        <div className="text-xs text-gray-400">{user.email}</div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {user.email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className={`px-2 py-1 text-xs font-medium rounded-full border-0 focus:ring-2 focus:ring-primary-500 ${getRoleBadgeColor(user.role)}`}
+                      className={`px-3 py-1.5 text-sm font-medium rounded-lg border-0 focus:ring-2 focus:ring-primary-500 ${getRoleBadgeColor(user.role)}`}
                     >
-                      <option value="ADMIN">Admin</option>
-                      <option value="ORGANIZER">Organizer</option>
-                      <option value="ATTENDEE">Attendee</option>
-                      <option value="VENDOR">Vendor</option>
+                      <option value="ADMIN">👑 Admin</option>
+                      <option value="ORGANIZER">📋 Organizer</option>
+                      <option value="ATTENDEE">🎫 Attendee</option>
+                      <option value="VENDOR">🏪 Vendor</option>
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => handleToggleActive(user.id, user.is_active)}
-                      className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors ${
                         user.is_active 
                           ? 'bg-green-100 text-green-700 hover:bg-green-200' 
                           : 'bg-red-100 text-red-700 hover:bg-red-200'
                       }`}
                     >
                       {user.is_active ? (
-                        <CheckBadgeIcon className="h-3 w-3" />
+                        <CheckBadgeIcon className="h-4 w-4" />
                       ) : (
-                        <XMarkIcon className="h-3 w-3" />
+                        <XMarkIcon className="h-4 w-4" />
                       )}
                       {user.is_active ? 'Active' : 'Inactive'}
                     </button>
@@ -203,7 +215,7 @@ const UsersPage: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleDeleteUser(user.id, `${user.first_name} ${user.last_name}`)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 rounded-lg"
                       >
                         <TrashIcon className="h-5 w-5" />
                       </button>

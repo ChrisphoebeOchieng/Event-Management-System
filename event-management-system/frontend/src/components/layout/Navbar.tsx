@@ -8,12 +8,16 @@ import {
   UserCircleIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
+import LanguageSwitcher from '../common/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const handleLogout = () => {
@@ -22,8 +26,7 @@ const Navbar: React.FC = () => {
   };
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Events', href: '/events' },
+    { name: t('common.events'), href: '/events' },
   ];
 
   const getProfilePictureUrl = (): string | undefined => {
@@ -33,11 +36,7 @@ const Navbar: React.FC = () => {
     return undefined;
   };
 
-  // Check if user is admin (case insensitive)
   const isAdmin = user?.role?.toLowerCase() === 'admin';
-
-  console.log('User role:', user?.role);
-  console.log('Is admin:', isAdmin);
 
   return (
     <nav className="bg-white shadow-md">
@@ -49,11 +48,16 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <Link
+              to="/"
+              className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
+            >
+              {t('common.home')}
+            </Link>
             {navigation.map((item) => (
               <Link
-                key={item.name}
+                key={item.href}
                 to={item.href}
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
               >
@@ -67,17 +71,16 @@ const Navbar: React.FC = () => {
                   to="/dashboard"
                   className="text-gray-700 hover:text-primary-600 text-sm font-medium transition-colors"
                 >
-                  Dashboard
+                  {t('common.dashboard')}
                 </Link>
                 
-                {/* Admin Link - Always show if admin */}
                 {isAdmin && (
                   <Link
                     to="/admin"
                     className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium flex items-center gap-1"
                   >
                     <UserGroupIcon className="h-4 w-4" />
-                    Admin Panel
+                    {t('admin.dashboard')}
                   </Link>
                 )}
                 
@@ -112,7 +115,7 @@ const Navbar: React.FC = () => {
                             className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
                           >
                             <Cog6ToothIcon className="h-5 w-5 mr-2" />
-                            Profile
+                            {t('common.profile')}
                           </Link>
                         )}
                       </Menu.Item>
@@ -120,11 +123,11 @@ const Navbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }: { active: boolean }) => (
                             <Link
-                              to="/admin"
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-purple-700`}
+                              to="/admin/refunds"
+                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-red-600`}
                             >
-                              <UserGroupIcon className="h-5 w-5 mr-2" />
-                              Admin Panel
+                              <CurrencyDollarIcon className="h-5 w-5 mr-2" />
+                              {t('admin.refunds')}
                             </Link>
                           )}
                         </Menu.Item>
@@ -136,13 +139,15 @@ const Navbar: React.FC = () => {
                             className={`${active ? 'bg-gray-50' : ''} flex items-center w-full px-4 py-2 text-sm text-red-600`}
                           >
                             <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
-                            Logout
+                            {t('common.logout')}
                           </button>
                         )}
                       </Menu.Item>
                     </Menu.Items>
                   </Transition>
                 </Menu>
+
+                <LanguageSwitcher />
               </div>
             ) : (
               <div className="flex items-center space-x-4">
@@ -150,19 +155,19 @@ const Navbar: React.FC = () => {
                   to="/login"
                   className="text-gray-700 hover:text-primary-600 text-sm font-medium transition-colors"
                 >
-                  Login
+                  {t('common.login')}
                 </Link>
                 <Link
                   to="/register"
                   className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
                 >
-                  Register
+                  {t('common.register')}
                 </Link>
+                <LanguageSwitcher />
               </div>
             )}
           </div>
 
-          {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -178,13 +183,12 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navigation.map((item) => (
               <Link
-                key={item.name}
+                key={item.href}
                 to={item.href}
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
@@ -199,7 +203,7 @@ const Navbar: React.FC = () => {
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Dashboard
+                  {t('common.dashboard')}
                 </Link>
                 {isAdmin && (
                   <Link
@@ -207,7 +211,7 @@ const Navbar: React.FC = () => {
                     className="block px-3 py-2 text-base font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    👑 Admin Panel
+                    {t('admin.dashboard')}
                   </Link>
                 )}
                 <Link
@@ -215,7 +219,7 @@ const Navbar: React.FC = () => {
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Profile
+                  {t('common.profile')}
                 </Link>
                 <button
                   onClick={() => {
@@ -224,8 +228,11 @@ const Navbar: React.FC = () => {
                   }}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-gray-50 rounded-lg"
                 >
-                  Logout
+                  {t('common.logout')}
                 </button>
+                <div className="pt-2 border-t border-gray-200">
+                  <LanguageSwitcher />
+                </div>
               </>
             ) : (
               <>
@@ -234,15 +241,18 @@ const Navbar: React.FC = () => {
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Login
+                  {t('common.login')}
                 </Link>
                 <Link
                   to="/register"
                   className="block px-3 py-2 text-base font-medium text-primary-600 hover:bg-gray-50 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Register
+                  {t('common.register')}
                 </Link>
+                <div className="pt-2 border-t border-gray-200">
+                  <LanguageSwitcher />
+                </div>
               </>
             )}
           </div>

@@ -15,7 +15,9 @@ import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import DashboardPage from './pages/DashboardPage';
 import BookingsPage from './pages/BookingsPage';
+import BookingDetailPage from './pages/BookingDetailPage';
 import ProfilePage from './pages/ProfilePage';
+import TranslationDemo from './pages/TranslationDemo';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -23,6 +25,8 @@ import UsersPage from './pages/admin/UsersPage';
 import AdminEventsPage from './pages/admin/AdminEventsPage';
 import AdminEventCreatePage from './pages/admin/AdminEventCreatePage';
 import AdminEventEditPage from './pages/admin/AdminEventEditPage';
+import AdminRefundsPage from './pages/admin/AdminRefundsPage';
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 
 // Protected Route
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -39,7 +43,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
-// Admin Route - Only users with ADMIN role can access
+// Admin Route
 const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   
@@ -69,12 +73,15 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
+        <Route path="/translation-demo" element={<TranslationDemo />} />
         
+        {/* Protected Routes */}
         <Route 
           path="/dashboard" 
           element={
@@ -88,6 +95,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <BookingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/bookings/:bookingRef" 
+          element={
+            <ProtectedRoute>
+              <BookingDetailPage />
             </ProtectedRoute>
           } 
         />
@@ -141,7 +156,24 @@ function AppContent() {
             </AdminRoute>
           } 
         />
+        <Route 
+          path="/admin/refunds" 
+          element={
+            <AdminRoute>
+              <AdminRefundsPage />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/analytics" 
+          element={
+            <AdminRoute>
+              <AdminAnalyticsPage />
+            </AdminRoute>
+          } 
+        />
       </Routes>
+      
       <ToastProvider />
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import { EnvelopeIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
@@ -10,23 +11,24 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error('Please fill in all fields');
+      toast.error(t('errors.required'));
       return;
     }
 
     setLoading(true);
     try {
       await login(email, password);
-      toast.success('Welcome back! 🎉');
+      toast.success(t('notifications.success'));
       navigate('/dashboard');
     } catch (err: any) {
-      toast.error(err.message || 'Login failed. Please try again.');
+      toast.error(err.message || t('errors.server_error'));
     } finally {
       setLoading(false);
     }
@@ -39,14 +41,14 @@ const LoginPage: React.FC = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-2xl mb-4">
             <span className="text-3xl">🎫</span>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="text-gray-500 mt-2">Sign in to manage your events and bookings</p>
+          <h2 className="text-3xl font-bold text-gray-900">{t('auth.welcome_back')}</h2>
+          <p className="text-gray-500 mt-2">{t('auth.sign_in_to_continue')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="input-label">
-              Email Address
+              {t('auth.email')}
             </label>
             <div className="relative">
               <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -66,10 +68,10 @@ const LoginPage: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="password" className="input-label mb-0">
-                Password
+                {t('auth.password')}
               </label>
               <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                Forgot password?
+                {t('auth.forgot_password')}
               </Link>
             </div>
             <div className="relative">
@@ -109,26 +111,20 @@ const LoginPage: React.FC = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Signing in...
+                {t('common.loading')}
               </span>
             ) : (
-              'Sign In'
+              t('auth.sign_in')
             )}
           </button>
         </form>
 
         <p className="text-center text-gray-600 mt-6">
-          Don't have an account?{' '}
+          {t('auth.dont_have_account')}{' '}
           <Link to="/register" className="text-primary-600 hover:text-primary-700 font-semibold">
-            Create one now
+            {t('auth.create_account')}
           </Link>
         </p>
-
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-center text-xs text-gray-500">
-            By signing in, you agree to our Terms of Service and Privacy Policy
-          </p>
-        </div>
       </div>
     </div>
   );

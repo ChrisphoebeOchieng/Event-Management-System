@@ -14,5 +14,7 @@ class BookingResponseSchema(Schema):
     status = fields.Str()
     payment_status = fields.Str()
     payment_reference = fields.Str()
+    ticket_number = fields.Str()
+    ticket_checked_in = fields.Bool()
     booked_at = fields.DateTime()
     updated_at = fields.DateTime()

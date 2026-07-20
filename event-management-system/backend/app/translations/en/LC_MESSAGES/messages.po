@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: EventSphere\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-20 18:00+0000\n"
+"PO-Revision-Date: 2026-07-20 18:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: app/__init__.py:64
+msgid "Event Management System API is running!"
+msgstr "Event Management System API is running!"
+
+#: app/api/auth.py:45
+msgid "User registered successfully"
+msgstr "User registered successfully"
+
+#: app/api/auth.py:55
+msgid "Login successful"
+msgstr "Login successful"
+
+#: app/api/auth.py:66
+msgid "Email already registered"
+msgstr "Email already registered"
+
+#: app/api/auth.py:69
+msgid "Username already taken"
+msgstr "Username already taken"
+
+#: app/api/events.py:35
+msgid "Event created successfully"
+msgstr "Event created successfully"
+
+#: app/api/events.py:52
+msgid "End date must be after start date"
+msgstr "End date must be after start date"
+
+#: app/api/events.py:55
+msgid "Start date cannot be in the past"
+msgstr "Start date cannot be in the past"
+
+#: app/api/bookings.py:50
+msgid "Booking created successfully"
+msgstr "Booking created successfully"
+
+#: app/api/bookings.py:60
+msgid "Booking cancelled successfully"
+msgstr "Booking cancelled successfully"
+
+#: app/api/payments.py:25
+msgid "Payment successful"
+msgstr "Payment successful"
+
+#: app/api/payments.py:30
+msgid "Payment failed"
+msgstr "Payment failed"
+
+#: app/api/refunds.py:30
+msgid "Refund request submitted successfully"
+msgstr "Refund request submitted successfully"
+
+#: app/api/refunds.py:40
+msgid "Refund approved successfully"
+msgstr "Refund approved successfully"
+
+#: app/api/refunds.py:45
+msgid "Refund rejected"
+msgstr "Refund rejected"
+
+#: app/api/vendors.py:40
+msgid "Vendor registered successfully"
+msgstr "Vendor registered successfully"
+
+#: app/api/vendors.py:50
+msgid "Vendor approved successfully"
+msgstr "Vendor approved successfully"

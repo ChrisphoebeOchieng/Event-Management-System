@@ -6,7 +6,9 @@ import {
   TicketIcon, 
   MagnifyingGlassIcon,
   ChevronDownIcon,
-  ChevronUpIcon
+  ChevronUpIcon,
+  QrCodeIcon,
+  ArrowRightIcon
 } from '@heroicons/react/24/outline';
 
 interface Booking {
@@ -22,6 +24,8 @@ interface Booking {
   mpesa_code?: string;
   paid_at?: string;
   booked_at: string;
+  ticket_number?: string;
+  ticket_checked_in?: boolean;
   event?: {
     title: string;
     start_date: string;
@@ -36,12 +40,23 @@ const BookingsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [generatingTicket, setGeneratingTicket] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
         const response = await api.get('/bookings/');
-        setBookings(response.data || []);
+        const bookingsWithEvents = await Promise.all(
+          response.data.map(async (booking: Booking) => {
+            try {
+              const eventRes = await api.get(`/events/${booking.event_id}`);
+              return { ...booking, event: eventRes.data };
+            } catch {
+              return { ...booking, event: undefined };
+            }
+          })
+        );
+        setBookings(bookingsWithEvents);
       } catch (error) {
         toast.error('Failed to load bookings');
       } finally {
@@ -51,9 +66,23 @@ const BookingsPage: React.FC = () => {
     fetchBookings();
   }, []);
 
+  const handleViewTicket = async (bookingRef: string, bookingId: number) => {
+    setGeneratingTicket(bookingId);
+    try {
+      const response = await api.get(`/bookings/${bookingRef}/ticket`);
+      toast.success('Ticket generated! Check console for QR code.');
+      console.log('Ticket data:', response.data);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to generate ticket');
+    } finally {
+      setGeneratingTicket(null);
+    }
+  };
+
   const filteredBookings = bookings.filter((booking) => {
     const matchesSearch = 
-      booking.booking_reference.toLowerCase().includes(searchTerm.toLowerCase());
+      booking.booking_reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.event?.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === '' || booking.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -99,7 +128,7 @@ const BookingsPage: React.FC = () => {
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by booking reference..."
+              placeholder="Search by booking reference or event..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -139,7 +168,7 @@ const BookingsPage: React.FC = () => {
                 onClick={() => toggleExpand(booking.id)}
               >
                 <div className="flex-1">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <TicketIcon className="h-5 w-5 text-primary-600" />
                     <span className="font-mono font-medium text-gray-900">
                       {booking.booking_reference}
@@ -154,14 +183,44 @@ const BookingsPage: React.FC = () => {
                     }`}>
                       {booking.payment_status}
                     </span>
+                    {booking.ticket_number && (
+                      <span className="text-xs text-gray-500 font-mono">
+                        🎫 {booking.ticket_number}
+                      </span>
+                    )}
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                    <span>{booking.event?.title || 'Event'}</span>
+                    <span>•</span>
                     <span>{booking.number_of_tickets} tickets</span>
+                    <span>•</span>
                     <span>KES {booking.total_amount.toFixed(2)}</span>
+                    <span>•</span>
                     <span>{new Date(booking.booked_at).toLocaleDateString()}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
+                  <Link
+                    to={`/bookings/${booking.booking_reference}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1 text-sm font-medium"
+                  >
+                    View Details
+                    <ArrowRightIcon className="h-4 w-4" />
+                  </Link>
+                  {booking.status === 'confirmed' && booking.payment_status === 'paid' && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewTicket(booking.booking_reference, booking.id);
+                      }}
+                      disabled={generatingTicket === booking.id}
+                      className="text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1 text-sm font-medium"
+                    >
+                      <QrCodeIcon className="h-5 w-5" />
+                      {generatingTicket === booking.id ? 'Generating...' : 'Get Ticket'}
+                    </button>
+                  )}
                   {expandedId === booking.id ? (
                     <ChevronUpIcon className="h-5 w-5 text-gray-400" />
                   ) : (
@@ -174,6 +233,11 @@ const BookingsPage: React.FC = () => {
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 animate-fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                     <div>
+                      <p className="text-gray-500">Event Details</p>
+                      <p className="font-medium text-gray-900 mt-1">{booking.event?.title}</p>
+                      <p className="text-gray-600">{booking.event?.venue}, {booking.event?.city}</p>
+                    </div>
+                    <div>
                       <p className="text-gray-500">Ticket Details</p>
                       <p className="font-medium text-gray-900 mt-1">{booking.number_of_tickets} tickets</p>
                       <p className="text-gray-600">Total: KES {booking.total_amount.toFixed(2)}</p>
@@ -182,17 +246,7 @@ const BookingsPage: React.FC = () => {
                     <div>
                       <p className="text-gray-500">Payment</p>
                       <p className="font-medium text-gray-900 mt-1 capitalize">{booking.payment_method || 'Not paid'}</p>
-                      {booking.mpesa_code && (
-                        <p className="text-gray-600">M-Pesa Code: {booking.mpesa_code}</p>
-                      )}
                       <p className="text-gray-600">Status: {booking.payment_status}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Booking Date</p>
-                      <p className="font-medium text-gray-900 mt-1">{new Date(booking.booked_at).toLocaleString()}</p>
-                      {booking.paid_at && (
-                        <p className="text-gray-600">Paid: {new Date(booking.paid_at).toLocaleString()}</p>
-                      )}
                     </div>
                   </div>
                 </div>

@@ -18,16 +18,15 @@ class User(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     phone_number = db.Column(db.String(20))
-    profile_picture = db.Column(db.String(255))  # Store the file path or URL
+    profile_picture = db.Column(db.String(255))
     role = db.Column(db.Enum(UserRole), default=UserRole.ATTENDEE)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationships
-    events_organized = db.relationship('Event', backref='organizer', lazy=True)
-    bookings = db.relationship('Booking', backref='attendee', lazy=True)
-    vendor_profile = db.relationship('Vendor', backref='user', uselist=False, lazy=True)
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
     def __repr__(self):
         return f'<User {self.username}>'

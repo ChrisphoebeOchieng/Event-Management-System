@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: EventSphere\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-20 18:00+0000\n"
+"PO-Revision-Date: 2026-07-20 18:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: sw\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: app/__init__.py:64
+msgid "Event Management System API is running!"
+msgstr "API ya Mfumo wa Usimamizi wa Matukio inafanya kazi!"
+
+#: app/api/auth.py:45
+msgid "User registered successfully"
+msgstr "Mtumiaji amesajiliwa kwa mafanikio"
+
+#: app/api/auth.py:55
+msgid "Login successful"
+msgstr "Kuingia kumefanikiwa"
+
+#: app/api/auth.py:66
+msgid "Email already registered"
+msgstr "Barua pepe tayari imesajiliwa"
+
+#: app/api/auth.py:69
+msgid "Username already taken"
+msgstr "Jina la mtumiaji tayari limechukuliwa"
+
+#: app/api/events.py:35
+msgid "Event created successfully"
+msgstr "Tukio limeundwa kwa mafanikio"
+
+#: app/api/events.py:52
+msgid "End date must be after start date"
+msgstr "Tarehe ya mwisho lazima iwe baada ya tarehe ya kuanza"
+
+#: app/api/events.py:55
+msgid "Start date cannot be in the past"
+msgstr "Tarehe ya kuanza haiwezi kuwa iliyopita"
+
+#: app/api/bookings.py:50
+msgid "Booking created successfully"
+msgstr "Nafasi imeundwa kwa mafanikio"
+
+#: app/api/bookings.py:60
+msgid "Booking cancelled successfully"
+msgstr "Nafasi imefutwa kwa mafanikio"
+
+#: app/api/payments.py:25
+msgid "Payment successful"
+msgstr "Malipo yamefanikiwa"
+
+#: app/api/payments.py:30
+msgid "Payment failed"
+msgstr "Malipo yameshindikana"
+
+#: app/api/refunds.py:30
+msgid "Refund request submitted successfully"
+msgstr "Ombi la marejesho limewasilishwa kwa mafanikio"
+
+#: app/api/refunds.py:40
+msgid "Refund approved successfully"
+msgstr "Marejesho yameidhinishwa kwa mafanikio"
+
+#: app/api/refunds.py:45
+msgid "Refund rejected"
+msgstr "Marejesho yamekataliwa"
+
+#: app/api/vendors.py:40
+msgid "Vendor registered successfully"
+msgstr "Mchuuzi amesajiliwa kwa mafanikio"
+
+#: app/api/vendors.py:50
+msgid "Vendor approved successfully"
+msgstr "Mchuuzi ameidhinishwa kwa mafanikio"

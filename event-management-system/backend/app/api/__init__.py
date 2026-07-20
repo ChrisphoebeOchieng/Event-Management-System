@@ -6,3 +6,7 @@ from app.api.vendors import vendors_bp
 from app.api.recommendations import recommendations_bp
 from app.api.upload import upload_bp
 from app.api.admin import admin_bp
+from app.api.ai_recommendations import ai_bp
+from app.api.refunds import refunds_bp
+from app.api.analytics import analytics_bp
+from app.api.test_email import test_email_bp

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import EventSearch, { SearchFilters } from '../components/events/EventSearch';
 import { 
-  MagnifyingGlassIcon, 
   MapPinIcon, 
-  ClockIcon,
+  ClockIcon, 
   StarIcon,
-  FunnelIcon
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 interface Event {
@@ -28,139 +28,159 @@ interface Event {
 const EventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-
-  const categories = ['Technology', 'Music', 'Business', 'Art', 'Sports', 'Food', 'Education'];
-  const cities = ['Nairobi', 'Mombasa', 'Kisumu', 'Eldoret', 'Nakuru'];
+  const [filters, setFilters] = useState<SearchFilters | null>(null);
+  const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        let url = '/events/?status=published';
-        if (selectedCategory) {
-          url += `&category=${selectedCategory}`;
-        }
-        if (selectedCity) {
-          url += `&city=${selectedCity}`;
-        }
-        const response = await api.get(url);
-        setEvents(response.data);
-      } catch (error) {
-        console.error('Failed to fetch events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchEvents();
-  }, [selectedCategory, selectedCity]);
+  }, []);
 
-  const filteredEvents = events.filter((event) =>
-    event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    event.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const clearFilters = () => {
-    setSelectedCategory('');
-    setSelectedCity('');
-    setSearchTerm('');
+  const fetchEvents = async (searchFilters?: SearchFilters) => {
+    setLoading(true);
+    try {
+      let url = '/events/?status=published';
+      
+      if (searchFilters) {
+        // Apply filters
+        if (searchFilters.category && searchFilters.category !== 'All') {
+          url += `&category=${searchFilters.category}`;
+        }
+        if (searchFilters.city && searchFilters.city !== 'All') {
+          url += `&city=${searchFilters.city}`;
+        }
+        if (searchFilters.status && searchFilters.status !== 'All') {
+          url += `&status=${searchFilters.status}`;
+        }
+        // Note: search, date, price, sort would need backend support
+        // We'll handle search client-side for now
+      }
+      
+      const response = await api.get(url);
+      let eventsData = response.data || [];
+      
+      // Client-side search filtering
+      if (searchFilters?.search) {
+        const searchTerm = searchFilters.search.toLowerCase();
+        eventsData = eventsData.filter((event: Event) =>
+          event.title.toLowerCase().includes(searchTerm) ||
+          event.description.toLowerCase().includes(searchTerm) ||
+          event.venue.toLowerCase().includes(searchTerm) ||
+          event.city.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Client-side price filtering
+      if (searchFilters?.priceMin) {
+        const minPrice = parseFloat(searchFilters.priceMin);
+        eventsData = eventsData.filter((event: Event) => event.ticket_price >= minPrice);
+      }
+      if (searchFilters?.priceMax) {
+        const maxPrice = parseFloat(searchFilters.priceMax);
+        eventsData = eventsData.filter((event: Event) => event.ticket_price <= maxPrice);
+      }
+      
+      // Client-side date filtering
+      if (searchFilters?.dateFrom) {
+        const fromDate = new Date(searchFilters.dateFrom);
+        eventsData = eventsData.filter((event: Event) => new Date(event.start_date) >= fromDate);
+      }
+      if (searchFilters?.dateTo) {
+        const toDate = new Date(searchFilters.dateTo);
+        toDate.setHours(23, 59, 59);
+        eventsData = eventsData.filter((event: Event) => new Date(event.start_date) <= toDate);
+      }
+      
+      // Client-side sorting
+      if (searchFilters?.sortBy) {
+        const sortBy = searchFilters.sortBy;
+        const sortOrder = searchFilters.sortOrder || 'asc';
+        eventsData.sort((a: any, b: any) => {
+          let aVal = a[sortBy];
+          let bVal = b[sortBy];
+          
+          if (sortBy === 'start_date' || sortBy === 'created_at') {
+            aVal = new Date(aVal).getTime();
+            bVal = new Date(bVal).getTime();
+          }
+          
+          if (sortOrder === 'asc') {
+            return aVal > bVal ? 1 : -1;
+          } else {
+            return aVal < bVal ? 1 : -1;
+          }
+        });
+      }
+      
+      setTotalResults(eventsData.length);
+      setEvents(eventsData);
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSearch = (searchFilters: SearchFilters) => {
+    setFilters(searchFilters);
+    fetchEvents(searchFilters);
+  };
+
+  const handleReset = () => {
+    setFilters(null);
+    fetchEvents();
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="animate-pulse space-y-4">
+          <div className="h-10 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-64 bg-gray-200 rounded-xl"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Browse Events</h1>
-        <p className="text-gray-600 mt-1">Find and book the best events in your city</p>
+        <p className="text-gray-500 mt-1">Find and book the best events in your city</p>
       </div>
 
-      {/* Search and Filters */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search Bar */}
-          <div className="flex-1 relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search events..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
+      <EventSearch onSearch={handleSearch} onReset={handleReset} />
 
-          {/* Filter Toggle Button */}
+      <div className="mt-6 flex justify-between items-center">
+        <p className="text-sm text-gray-500">
+          {totalResults} event{totalResults !== 1 ? 's' : ''} found
+        </p>
+        {filters && (
           <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center justify-center gap-2 bg-gray-100 px-4 py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            onClick={handleReset}
+            className="text-sm text-primary-600 hover:text-primary-700 font-medium"
           >
-            <FunnelIcon className="h-5 w-5" />
-            <span>Filters</span>
+            Clear all filters
           </button>
-
-          {/* Clear Filters */}
-          {(selectedCategory || selectedCity || searchTerm) && (
-            <button
-              onClick={clearFilters}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-
-        {/* Filter Panel */}
-        {showFilters && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">All Cities</option>
-                  {cities.map((city) => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
         )}
       </div>
 
-      {/* Events Grid */}
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-          <p className="text-gray-600 mt-4">Loading events...</p>
-        </div>
-      ) : filteredEvents.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 text-lg">No events found</p>
-          <p className="text-gray-500 text-sm mt-1">Try adjusting your search or filters</p>
+      {events.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-soft p-12 text-center mt-6">
+          <MagnifyingGlassIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No events found</h3>
+          <p className="text-gray-500">
+            {filters ? 'Try adjusting your search or filters' : 'Check back later for new events'}
+          </p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event) => (
-            <Link to={`/events/${event.id}`} key={event.id} className="card hover:shadow-xl transition-shadow">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {events.map((event) => (
+            <Link to={`/events/${event.id}`} key={event.id} className="card hover:shadow-xl transition-all hover:-translate-y-1">
               {event.image_url && (
                 <img
                   src={event.image_url}

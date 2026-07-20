@@ -7,10 +7,9 @@ import {
   TicketIcon,
   BuildingStorefrontIcon,
   UserPlusIcon,
-  CheckBadgeIcon,
-  XMarkIcon,
-  ChartBarIcon,
-  ArrowTrendingUpIcon
+  ArrowTrendingUpIcon,
+  CurrencyDollarIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard: React.FC = () => {
@@ -32,10 +31,10 @@ const AdminDashboard: React.FC = () => {
   }, []);
 
   const quickActions = [
-    { icon: UserPlusIcon, label: 'Add User', path: '/admin/users/add', color: 'bg-primary-600' },
+    { icon: UserPlusIcon, label: 'Manage Users', path: '/admin/users', color: 'bg-primary-600' },
     { icon: CalendarIcon, label: 'Create Event', path: '/admin/events/create', color: 'bg-blue-600' },
-    { icon: UserGroupIcon, label: 'Manage Users', path: '/admin/users', color: 'bg-purple-600' },
-    { icon: BuildingStorefrontIcon, label: 'Manage Vendors', path: '/admin/vendors', color: 'bg-green-600' },
+    { icon: ChartBarIcon, label: 'Analytics', path: '/admin/analytics', color: 'bg-purple-600' },
+    { icon: CurrencyDollarIcon, label: 'Refunds', path: '/admin/refunds', color: 'bg-red-600' },
   ];
 
   if (loading) {
@@ -55,7 +54,6 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-primary-600 rounded-2xl p-8 mb-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
@@ -70,7 +68,6 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-soft p-6">
@@ -121,7 +118,6 @@ const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -138,51 +134,26 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Link to="/admin/users" className="card p-6 hover:shadow-lg transition-all hover:-translate-y-1">
           <UserGroupIcon className="h-8 w-8 text-purple-600 mb-3" />
           <h3 className="text-lg font-semibold text-gray-900">User Management</h3>
-          <p className="text-gray-500 text-sm mt-1">View, add, edit, and manage all users</p>
+          <p className="text-gray-500 text-sm mt-1">View, edit, and manage all users</p>
           <ul className="mt-3 text-sm text-gray-600 space-y-1">
-            <li>• Change user roles (Admin, Organizer, Vendor, Attendee)</li>
+            <li>• Change user roles</li>
             <li>• Activate/Deactivate users</li>
             <li>• Delete users</li>
-            <li>• Add new users</li>
           </ul>
         </Link>
 
         <Link to="/admin/events" className="card p-6 hover:shadow-lg transition-all hover:-translate-y-1">
           <CalendarIcon className="h-8 w-8 text-blue-600 mb-3" />
           <h3 className="text-lg font-semibold text-gray-900">Event Management</h3>
-          <p className="text-gray-500 text-sm mt-1">Create, edit, publish, and manage events</p>
+          <p className="text-gray-500 text-sm mt-1">Create, edit, and manage events</p>
           <ul className="mt-3 text-sm text-gray-600 space-y-1">
             <li>• Create new events</li>
             <li>• Edit event details</li>
             <li>• Publish/Unpublish events</li>
-            <li>• Manage all events</li>
-          </ul>
-        </Link>
-
-        <Link to="/admin/vendors" className="card p-6 hover:shadow-lg transition-all hover:-translate-y-1">
-          <BuildingStorefrontIcon className="h-8 w-8 text-green-600 mb-3" />
-          <h3 className="text-lg font-semibold text-gray-900">Vendor Management</h3>
-          <p className="text-gray-500 text-sm mt-1">Manage all vendors on the platform</p>
-          <ul className="mt-3 text-sm text-gray-600 space-y-1">
-            <li>• Approve/Reject vendors</li>
-            <li>• View vendor details</li>
-            <li>• Manage vendor assignments</li>
-          </ul>
-        </Link>
-
-        <Link to="/admin/bookings" className="card p-6 hover:shadow-lg transition-all hover:-translate-y-1">
-          <TicketIcon className="h-8 w-8 text-yellow-600 mb-3" />
-          <h3 className="text-lg font-semibold text-gray-900">Booking Management</h3>
-          <p className="text-gray-500 text-sm mt-1">View and manage all bookings</p>
-          <ul className="mt-3 text-sm text-gray-600 space-y-1">
-            <li>• View all bookings</li>
-            <li>• Process refunds</li>
-            <li>• Booking analytics</li>
           </ul>
         </Link>
       </div>

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import AIRecommendations from '../components/events/AIRecommendations';
+import TestTranslation from '../components/TestTranslation';
 import { 
   CalendarIcon, 
   TicketIcon, 
@@ -27,6 +30,7 @@ interface Event {
 }
 
 const HomePage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,7 +68,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
@@ -92,7 +95,8 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      <TestTranslation />
+
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -113,7 +117,14 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Featured Events Section */}
+      {isAuthenticated && (
+        <section className="py-12 bg-gradient-to-r from-purple-50 to-primary-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <AIRecommendations />
+          </div>
+        </section>
+      )}
+
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
@@ -187,7 +198,6 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="bg-primary-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Create Your Own Event?</h2>
